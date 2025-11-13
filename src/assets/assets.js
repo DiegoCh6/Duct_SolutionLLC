@@ -1,4 +1,7 @@
 import logoduct from './logo_duct.png'
+import last_work1 from './last_work1.jpeg'
+import last_work2 from './last_work2.jpeg'
+import last_work3 from './last_work3.jpeg'
 import install_image from './install_image.png'
 import manteniminento_image from './mantenimiento_image.png'
 import repair_image from './repair_image.png'
@@ -49,6 +52,9 @@ import about_image from './about_image.jpg'
 // ]
 
 const assets = {
+  last_work1,
+  last_work2,
+  last_work3,
   install_image,
   manteniminento_image,
   repair_image,

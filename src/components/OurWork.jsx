@@ -2,70 +2,76 @@ import React, { useState, useEffect } from "react";
 import Title from "./Title";
 import assets from "../assets/assets";
 import { motion, AnimatePresence } from "motion/react";
+import { a } from "motion/react-client";
 
 const OurWork = () => {
   const workData = [
     {
+      title: "House HVAC System Upgrade",
+      description:
+        "New HVAC system installation with energy-efficient components and smart thermostat integration.",
+      images: [assets.last_work1, assets.last_work2, assets.last_work3], // Array of images
+      location: "Maryland, MD",
+    },
+    {
       title: "Commercial Duct Installation",
       description:
         "High-capacity supply and return ducts installed with acoustic insulation for optimal airflow and reduced noise.",
-      image: assets.job1ducts,
+      images: [assets.job1ducts], // Multiple images
       location: "Miami, FL",
     },
     {
       title: "Industrial Ventilation Upgrade",
       description:
         "Upgraded ventilation lines and dampers to improve extraction efficiency and meet compliance standards.",
-      image: assets.job2ducts,
+      images: [assets.job2ducts],
       location: "San Diego, CA",
     },
     {
       title: "Residential HVAC Retrofit",
       description:
         "Energy-efficient retrofit with new return path and sealed joints for improved comfort and performance.",
-      image: assets.job3ducts,
+      images: [assets.job3ducts],
       location: "Austin, TX",
     },
     {
       title: "Kitchen Exhaust System",
       description:
         "Stainless steel ducting and hood exhaust system with certified grease-rated components.",
-      image: assets.job4ducts,
+      images: [assets.job4ducts],
       location: "Orlando, FL",
     },
     {
       title: "Warehouse Air Distribution",
       description:
         "Large-format spiral ducts for uniform air distribution across open floor spaces.",
-      image: assets.job5ducts,
+      images: [assets.job5ducts],
       location: "Phoenix, AZ",
     },
     {
       title: "Office Air Quality Upgrade",
       description:
         "New filtration stage and rebalanced VAV boxes to enhance indoor air quality.",
-      image: assets.job6ducts,
+      images: [assets.job6ducts],
       location: "Seattle, WA",
     },
   ];
 
   const [selectedIndex, setSelectedIndex] = useState(null);
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Close modal with ESC
+  // Solo cerrar con ESC (navegación ahora solo por clicks)
   useEffect(() => {
     if (selectedIndex === null) return;
     const handler = (e) => {
-      if (e.key === "Escape") setSelectedIndex(null);
-      if (e.key === "ArrowRight")
-        setSelectedIndex((prev) => (prev + 1) % workData.length);
-      if (e.key === "ArrowLeft")
-        setSelectedIndex(
-          (prev) => (prev - 1 + workData.length) % workData.length
-        );
+      if (e.key === "Escape") {
+        setSelectedIndex(null);
+        setCurrentImageIndex(0);
+      }
     };
     window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
-  }, [selectedIndex, workData.length]);
+  }, [selectedIndex]);
 
   return (
     <motion.div
@@ -93,20 +99,29 @@ const OurWork = () => {
             key={index}
             className="group cursor-pointer overflow-hidden rounded-xl border border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-900 shadow-2xl shadow-gray-100 dark:shadow-white/10 hover:shadow-3xl transition-all focus:outline-none focus:ring-2 focus:ring-primary"
             tabIndex={0}
-            onClick={() => setSelectedIndex(index)}
+            onClick={() => {
+              setSelectedIndex(index);
+              setCurrentImageIndex(0);
+            }}
             onKeyDown={(e) => {
               if (e.key === "Enter" || e.key === " ") {
                 e.preventDefault();
                 setSelectedIndex(index);
+                setCurrentImageIndex(0);
               }
             }}
           >
             <div className="relative aspect-[4/3] w-full overflow-hidden">
               <img
-                src={work.image}
+                src={work.images[0]}
                 className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]"
                 alt={work.title}
               />
+              {work.images.length > 1 && (
+                <div className="absolute top-3 left-3 px-2 py-1 rounded-full text-[10px] font-medium bg-white/85 dark:bg-gray-800/85 text-gray-800 dark:text-gray-100 shadow">
+                  {work.images.length} fotos
+                </div>
+              )}
               {work.location && (
                 <div className="absolute bottom-3 left-3 px-2.5 py-1 rounded-full text-xs font-medium bg-white/85 dark:bg-gray-800/85 text-gray-800 dark:text-gray-100 shadow">
                   {work.location}
@@ -151,19 +166,90 @@ const OurWork = () => {
                   onClick={(e) => e.stopPropagation()}
                 >
                   <img
-                    src={selected.image}
-                    alt={selected.title}
+                    src={selected.images[currentImageIndex]}
+                    alt={`${selected.title} - Image ${currentImageIndex + 1}`}
                     className="w-full max-h-[75vh] object-contain rounded-xl shadow-2xl bg-black"
                   />
                   <button
-                    onClick={() => setSelectedIndex(null)}
+                    onClick={() => {
+                      setSelectedIndex(null);
+                      setCurrentImageIndex(0);
+                    }}
                     className="absolute top-3 right-3 bg-white/85 dark:bg-gray-800/85 backdrop-blur px-3 py-1 rounded-full text-xs font-medium hover:bg-white dark:hover:bg-gray-700 transition"
                   >
                     Cerrar
                   </button>
-                  {/* Prev / Next */}
-                  {workData.length > 1 && (
-                    <>
+
+                  {/* Project navigation - Large side arrows */}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedIndex(
+                        (prev) => (prev - 1 + workData.length) % workData.length
+                      );
+                      setCurrentImageIndex(0);
+                    }}
+                    className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-primary/95 hover:bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-xl transition-all hover:scale-110"
+                    aria-label="Previous project"
+                    title="Proyecto anterior (←)"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setSelectedIndex((prev) => (prev + 1) % workData.length);
+                      setCurrentImageIndex(0);
+                    }}
+                    className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-primary/95 hover:bg-primary text-white w-12 h-12 rounded-full flex items-center justify-center text-2xl font-bold shadow-xl transition-all hover:scale-110"
+                    aria-label="Next project"
+                    title="Proyecto siguiente (→)"
+                  >
+                    ›
+                  </button>
+
+                  {/* Contador + flechas de fotos en parte superior izquierda */}
+                  {selected.images.length > 1 && (
+                    <div className="absolute top-3 left-3 flex flex-col gap-2">
+                      <div className="text-[10px] px-2 py-1 rounded-full bg-black/55 text-white tracking-wide shadow">
+                        Foto {currentImageIndex + 1} / {selected.images.length}
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex(
+                              (prev) =>
+                                (prev - 1 + selected.images.length) %
+                                selected.images.length
+                            );
+                          }}
+                          aria-label="Foto anterior"
+                          title="Foto anterior"
+                          className="w-7 h-7 flex items-center justify-center rounded-md bg-white/20 hover:bg-white/35 text-white text-sm font-bold transition shadow"
+                        >
+                          ‹
+                        </button>
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setCurrentImageIndex(
+                              (prev) => (prev + 1) % selected.images.length
+                            );
+                          }}
+                          aria-label="Foto siguiente"
+                          title="Foto siguiente"
+                          className="w-7 h-7 flex items-center justify-center rounded-md bg-white/20 hover:bg-white/35 text-white text-sm font-bold transition shadow"
+                        >
+                          ›
+                        </button>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Barra inferior solo para proyectos */}
+                  <div className="absolute bottom-6 left-0 right-0 flex justify-center px-4">
+                    <div className="flex items-center gap-2 bg-primary/95 text-white px-5 py-2 rounded-full shadow-lg">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
@@ -171,29 +257,31 @@ const OurWork = () => {
                             (prev) =>
                               (prev - 1 + workData.length) % workData.length
                           );
+                          setCurrentImageIndex(0);
                         }}
-                        className="absolute left-2 md:left-4 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shadow"
-                        aria-label="Previous image"
+                        className="text-xs font-semibold hover:underline"
                       >
-                        &lt;
+                        ‹ Proyecto
                       </button>
+                      <div className="w-px h-4 bg-white/30" />
+                      <span className="text-[10px] opacity-90">
+                        {selectedIndex + 1} / {workData.length}
+                      </span>
+                      <div className="w-px h-4 bg-white/30" />
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
                           setSelectedIndex(
                             (prev) => (prev + 1) % workData.length
                           );
+                          setCurrentImageIndex(0);
                         }}
-                        className="absolute right-2 md:right-4 top-1/2 -translate-y-1/2 bg-white/80 dark:bg-gray-800/80 hover:bg-white dark:hover:bg-gray-700 w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shadow"
-                        aria-label="Next image"
+                        className="text-xs font-semibold hover:underline"
                       >
-                        &gt;
+                        Proyecto ›
                       </button>
-                      <div className="absolute top-3 left-3 text-[10px] px-2 py-1 rounded-full bg-black/50 text-white tracking-wide">
-                        {selectedIndex + 1} / {workData.length}
-                      </div>
-                    </>
-                  )}
+                    </div>
+                  </div>
                   <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/70 to-transparent p-5 rounded-b-xl">
                     <h4 className="text-white font-semibold text-sm">
                       {selected.title}
