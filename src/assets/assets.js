@@ -39,7 +39,8 @@ import instagram_icon from './instagram_icon.svg'
 import menu_icon_dark from './menu_icon_dark.svg'
 import sun_icon from './sun_icon.svg'
 import moon_icon from './moon_icon.svg'
-import about_image from './about_image.jpg'
+import about_image from './about_image.jpeg'
+import about_image2 from './about_image2.jpeg'
 
 
 // export const company_logos = [
@@ -87,7 +88,8 @@ const assets = {
   menu_icon_dark,
   sun_icon,
   moon_icon,
-  about_image
+  about_image,
+  about_image2,
 }
 
 export default assets

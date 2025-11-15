@@ -1,7 +1,7 @@
-import React from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Title from "./Title";
 import assets from "../assets/assets";
-import { motion } from "motion/react";
+import { motion, AnimatePresence } from "motion/react";
 
 const AboutUS = () => {
   const stats = [
@@ -34,6 +34,35 @@ const AboutUS = () => {
     },
   ];
 
+  // Images for the slideshow (ensure each exists in assets to avoid build errors)
+  const aboutImages = useMemo(
+    () => [assets.about_image, assets.about_image2].filter(Boolean),
+    []
+  );
+
+  // Slideshow state
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [isHovered, setIsHovered] = useState(false);
+  const intervalRef = useRef(null);
+  const AUTO_DELAY = 4500; // ms
+
+  const goNext = () =>
+    setCurrentIndex((prev) => (prev + 1) % Math.max(aboutImages.length, 1));
+  const goPrev = () =>
+    setCurrentIndex((prev) =>
+      (prev - 1 + Math.max(aboutImages.length, 1)) % Math.max(aboutImages.length, 1)
+    );
+
+  // Autoplay effect (pauses on hover)
+  useEffect(() => {
+    if (aboutImages.length <= 1) return; // no autoplay if only one image
+    if (isHovered) return; // pause on hover
+    intervalRef.current = setInterval(goNext, AUTO_DELAY);
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
+  }, [currentIndex, isHovered, aboutImages.length]);
+
   return (
     <motion.div
       id="about-us"
@@ -57,13 +86,58 @@ const AboutUS = () => {
           viewport={{ once: true }}
           className="relative"
         >
-          <div className="relative rounded-2xl overflow-hidden shadow-2xl h-[320px] sm:h-[380px] lg:h-[460px]">
-            <img
-              src={assets.about_image}
-              alt="About Duct Solution"
-              className="w-full h-full object-cover object-center rounded-2xl"
-            />
-            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent"></div>
+          <div
+            className="relative rounded-2xl overflow-hidden shadow-2xl h-[320px] sm:h-[380px] lg:h-[460px]"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+          >
+            {/* Slideshow images with crossfade */}
+            <div className="absolute inset-0">
+              <AnimatePresence initial={false} mode="wait">
+                {aboutImages.length > 0 && (
+                  <motion.img
+                    key={aboutImages[currentIndex]}
+                    src={aboutImages[currentIndex]}
+                    alt="About Duct Solution"
+                    className="w-full h-full object-cover object-center"
+                    initial={{ opacity: 0.2, scale: 1.02 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    exit={{ opacity: 0, scale: 1.01 }}
+                    transition={{ duration: 0.6, ease: "easeOut" }}
+                  />
+                )}
+              </AnimatePresence>
+            </div>
+
+            {/* Overlay gradient */}
+            <div className="absolute inset-0 bg-gradient-to-t from-primary/20 to-transparent pointer-events-none"></div>
+
+            {/* Counter + small arrows (top-left) */}
+            {aboutImages.length > 1 && (
+              <div className="absolute top-3 left-3 flex flex-col gap-2 z-10">
+                <div className="text-[10px] px-2 py-1 rounded-full bg-black/50 text-white tracking-wide shadow">
+                  {currentIndex + 1} / {aboutImages.length}
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={goPrev}
+                    aria-label="Previous photo"
+                    title="Previous photo"
+                    className="w-7 h-7 flex items-center justify-center rounded-md bg-white/20 hover:bg-white/35 text-white text-sm font-bold transition shadow"
+                  >
+                    ‹
+                  </button>
+                  <button
+                    onClick={goNext}
+                    aria-label="Next photo"
+                    title="Next photo"
+                    className="w-7 h-7 flex items-center justify-center rounded-md bg-white/20 hover:bg-white/35 text-white text-sm font-bold transition shadow"
+                  >
+                    ›
+                  </button>
+                </div>
+              </div>
+            )}
           </div>
         </motion.div>
 
